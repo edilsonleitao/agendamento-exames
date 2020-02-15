@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
-import { StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  Text,
+} from 'react-native';
 import { ListItem } from 'react-native-elements';
 import { uuid } from 'uuidv4';
 
 const Solicitacoes = ({ navigation, route }) => {
+  console.log(navigation);
+
   const { beneficiario } = route.params;
   const [examesSolicitados, setExamesSolicitados] = useState([
     {
@@ -22,21 +30,41 @@ const Solicitacoes = ({ navigation, route }) => {
     },
   ]);
 
+  navigation.setOptions({
+    headerLeft: () => (
+      <TouchableOpacity onPress={navigation.reset}>
+        <Text style={styles.btnSair}>Sair</Text>
+      </TouchableOpacity>
+    ),
+    headerRight: () => (
+      <TouchableOpacity onPress={() => navigateToExames()}>
+        <Text style={styles.btnAgendar}>Agendar</Text>
+      </TouchableOpacity>
+    ),
+  });
+
   const solicitarExame = ({ nome, tipo, status }) =>
     setExamesSolicitados(prevExames => [
       { id: uuid(), nome, tipo, status, beneficiario },
       ...prevExames,
     ]);
 
+  const cancelarExame = id =>
+    setExamesSolicitados(prevExames =>
+      prevExames.filter(exame => id !== exame.id),
+    );
+
   const navigateToExames = exame =>
-    navigation.navigate('Exames', { exame, solicitarExame });
+    navigation.navigate('Agendar', {
+      exame,
+      solicitarExame,
+      cancelarExame,
+    });
 
   const renderExames = ({ item: exame }) => (
     <TouchableOpacity
       style={styles.btnEntrar}
-      onPress={() => {
-        return navigateToExames(exame);
-      }}>
+      onPress={() => navigateToExames(exame)}>
       <ListItem
         title={exame.nome}
         subtitle={exame.tipo}
@@ -76,6 +104,16 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     color: '#999',
+  },
+  btnSair: {
+    color: '#fff',
+    fontSize: 18,
+    marginLeft: 20,
+  },
+  btnAgendar: {
+    color: '#fff',
+    fontSize: 18,
+    marginRight: 20,
   },
 });
 

@@ -24,11 +24,7 @@ const Routes = ({ addExames }) => (
       component={Solicitacoes}
       options={{ gestureEnabled: false, headerLeft: false }}
     />
-    <Stack.Screen
-      name="Exames"
-      component={Exames}
-      options={{ headerBackTitleVisible: false }}
-    />
+    <Stack.Screen name="Agendar" component={Exames} />
   </Stack.Navigator>
 );
 

@@ -12,16 +12,13 @@ import {
 import { Input } from 'react-native-elements';
 
 const Exames = ({ navigation, route }) => {
-  const { exame, solicitarExame } = route.params;
+  const { exame = {}, solicitarExame, cancelarExame } = route.params;
 
-  const [nomeExame, setNomeExame] = useState(exame.nome);
-  const [tipoExame, setTipoExame] = useState(exame.tipo);
-  const [status, setStatus] = useState(exame.status);
+  const [nomeExame, setNomeExame] = useState(exame.nome || null);
+  const [tipoExame, setTipoExame] = useState(exame.tipo || null);
+  const [status] = useState(exame.status || null);
 
   const navigateToSolicitacoes = () => navigation.navigate('Solicitações');
-
-  const handlerNomeExame = nome => setNomeExame(nome);
-  const handlerTipoExame = nome => setTipoExame(nome);
 
   const handlerSolicitar = () => {
     if (!nomeExame || !tipoExame) {
@@ -33,6 +30,11 @@ const Exames = ({ navigation, route }) => {
       return;
     }
     solicitarExame({ nome: nomeExame, tipo: tipoExame, status });
+    navigateToSolicitacoes();
+  };
+
+  const handlerCancelar = () => {
+    cancelarExame(exame.id);
     navigateToSolicitacoes();
   };
 
@@ -51,7 +53,7 @@ const Exames = ({ navigation, route }) => {
             autoCapitalize="words"
             keyboardAppearance="dark"
             value={nomeExame}
-            onChangeText={handlerNomeExame}
+            onChangeText={text => setNomeExame(text)}
             disabled={desabilitaAlteracaoPedido()}
           />
           <Input
@@ -62,16 +64,37 @@ const Exames = ({ navigation, route }) => {
             autoCapitalize="words"
             keyboardAppearance="dark"
             value={tipoExame}
-            onChangeText={handlerTipoExame}
+            onChangeText={text => setTipoExame(text)}
             disabled={desabilitaAlteracaoPedido()}
           />
 
-          <TouchableOpacity
-            style={styles.btnSalvar}
-            onPress={handlerSolicitar}
-            disabled={desabilitaAlteracaoPedido()}>
-            <Text style={styles.btnSalvarText}>Solicitar</Text>
-          </TouchableOpacity>
+          <View style={styles.containerBtn}>
+            <TouchableOpacity
+              style={
+                desabilitaAlteracaoPedido()
+                  ? { ...styles.btn, backgroundColor: '#999' }
+                  : styles.btn
+              }
+              onPress={handlerSolicitar}
+              disabled={desabilitaAlteracaoPedido()}>
+              <Text style={styles.btnText}>
+                {exame.id ? 'Editar' : 'Solicitar'}
+              </Text>
+            </TouchableOpacity>
+
+            {exame.id && (
+              <TouchableOpacity
+                style={
+                  desabilitaAlteracaoPedido()
+                    ? { ...styles.btn, backgroundColor: '#999' }
+                    : styles.btn
+                }
+                onPress={handlerCancelar}
+                disabled={desabilitaAlteracaoPedido()}>
+                <Text style={styles.btnText}>Cancelar</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
@@ -82,17 +105,20 @@ const styles = StyleSheet.create({
   input: {
     marginTop: 20,
   },
-  btnSalvar: {
+  containerBtn: {
+    marginTop: 40,
+  },
+  btn: {
     backgroundColor: '#DF5C48',
     width: '90%',
     borderRadius: 20,
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 10,
     alignSelf: 'center',
   },
-  btnSalvarText: {
+  btnText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 17,

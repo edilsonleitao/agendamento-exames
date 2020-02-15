@@ -17,7 +17,6 @@ const Login = ({ navigation }) => {
   const navigateToSolicitacoes = () =>
     navigation.navigate('Solicitações', { beneficiario });
 
-  const handlerBeneficiario = nome => setBeneficiario(nome);
   const handlerEntrar = () => {
     if (!beneficiario) {
       Alert.alert(
@@ -43,7 +42,7 @@ const Login = ({ navigation }) => {
             placeholder="Nome"
             autoCapitalize="words"
             autoCorrect={false}
-            onChangeText={handlerBeneficiario}
+            onChangeText={text => setBeneficiario(text)}
             keyboardAppearance="dark"
           />
           <TextInput
