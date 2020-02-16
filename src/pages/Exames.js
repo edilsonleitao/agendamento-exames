@@ -34,7 +34,7 @@ const Exames = ({ navigation, route }) => {
   };
 
   const handlerCancelar = () => {
-    cancelarExame(exame.id);
+    cancelarExame(exame._id);
     navigateToSolicitacoes();
   };
 
@@ -78,11 +78,11 @@ const Exames = ({ navigation, route }) => {
               onPress={handlerSolicitar}
               disabled={desabilitaAlteracaoPedido()}>
               <Text style={styles.btnText}>
-                {exame.id ? 'Editar' : 'Solicitar'}
+                {exame._id ? 'Editar' : 'Solicitar'}
               </Text>
             </TouchableOpacity>
 
-            {exame.id && (
+            {exame._id && (
               <TouchableOpacity
                 style={
                   desabilitaAlteracaoPedido()

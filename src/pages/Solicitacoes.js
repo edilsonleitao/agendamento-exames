@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   FlatList,
@@ -7,7 +7,7 @@ import {
   Text,
 } from 'react-native';
 import { ListItem } from 'react-native-elements';
-import { uuid } from 'uuidv4';
+import APIExame from '../services/exame';
 
 const Solicitacoes = ({ navigation, route }) => {
   const { cliente } = route.params;
@@ -26,16 +26,40 @@ const Solicitacoes = ({ navigation, route }) => {
     ),
   });
 
-  const solicitarExame = ({ nome, tipo, status }) =>
+  useEffect(() => {
+    async function buscaExames() {
+      const response = await APIExame.get('/exameCliente', {
+        params: {
+          cliente,
+        },
+      });
+      setExamesSolicitados(response.data);
+    }
+
+    buscaExames();
+  }, [cliente, examesSolicitados]);
+
+  const solicitarExame = async ({ nome, tipo, status }) => {
+    await APIExame.post('/exame', {
+      nome,
+      tipo,
+      cliente,
+      status: 'Aguardando',
+    });
+
     setExamesSolicitados(prevExames => [
-      { id: uuid(), nome, tipo, status, cliente },
+      { nome, tipo, status, cliente },
       ...prevExames,
     ]);
+  };
 
-  const cancelarExame = id =>
+  const cancelarExame = async id => {
+    await APIExame.delete(`/exame/${id}`);
+
     setExamesSolicitados(prevExames =>
-      prevExames.filter(exame => id !== exame.id),
+      prevExames.filter(exame => id !== exame._id),
     );
+  };
 
   const navigateToExames = exame =>
     navigation.navigate('Agendar', {
@@ -64,7 +88,7 @@ const Solicitacoes = ({ navigation, route }) => {
 
   return (
     <FlatList
-      keyExtractor={item => item.id}
+      keyExtractor={item => item._id}
       data={examesSolicitados}
       renderItem={renderExames}
     />
