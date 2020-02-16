@@ -10,25 +10,8 @@ import { ListItem } from 'react-native-elements';
 import { uuid } from 'uuidv4';
 
 const Solicitacoes = ({ navigation, route }) => {
-  console.log(navigation);
-
-  const { beneficiario } = route.params;
-  const [examesSolicitados, setExamesSolicitados] = useState([
-    {
-      id: uuid(),
-      nome: 'Radiografia',
-      tipo: 'Imagem',
-      status: 'Sincronizado',
-      beneficiario,
-    },
-    {
-      id: uuid(),
-      nome: 'Hemograma',
-      tipo: 'Sanguíneo',
-      status: 'Realizado',
-      beneficiario,
-    },
-  ]);
+  const { cliente } = route.params;
+  const [examesSolicitados, setExamesSolicitados] = useState([]);
 
   navigation.setOptions({
     headerLeft: () => (
@@ -45,7 +28,7 @@ const Solicitacoes = ({ navigation, route }) => {
 
   const solicitarExame = ({ nome, tipo, status }) =>
     setExamesSolicitados(prevExames => [
-      { id: uuid(), nome, tipo, status, beneficiario },
+      { id: uuid(), nome, tipo, status, cliente },
       ...prevExames,
     ]);
 

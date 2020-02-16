@@ -12,19 +12,42 @@ import {
   Alert,
 } from 'react-native';
 
-const Login = ({ navigation }) => {
-  const [beneficiario, setBeneficiario] = useState(null);
-  const navigateToSolicitacoes = () =>
-    navigation.navigate('Solicitações', { beneficiario });
+import APICliente from '../services/cliente';
 
-  const handlerEntrar = () => {
-    if (!beneficiario) {
-      Alert.alert(
-        'Atenção',
-        'Informe o nome do beneficiário para entrar no sistema.',
-        [{ text: 'Ok' }],
-      );
+const Login = ({ navigation }) => {
+  const [cliente, setCliente] = useState(null);
+
+  const navigateToSolicitacoes = () =>
+    navigation.navigate('Solicitações', { cliente });
+
+  const handlerEntrar = async () => {
+    if (!cliente) {
+      Alert.alert('Atenção', 'Informe o seu nome  para entrar no sistema.', [
+        { text: 'Ok' },
+      ]);
       return;
+    }
+
+    const consultaCliente = await APICliente.get('/clienteNome', {
+      params: {
+        nome: cliente,
+      },
+    });
+
+    if (!consultaCliente.data.length) {
+      const clienteCadastrado = await APICliente.post('/cliente', {
+        nome: cliente,
+      });
+
+      if (!clienteCadastrado.data) {
+        Alert.alert('Erro', 'Ocorreu um erro na conexão. Tente novamente.', [
+          { text: 'Ok' },
+        ]);
+        return;
+      }
+
+      const { nome } = clienteCadastrado.data;
+      setCliente(nome);
     }
     navigateToSolicitacoes();
   };
@@ -42,7 +65,7 @@ const Login = ({ navigation }) => {
             placeholder="Nome"
             autoCapitalize="words"
             autoCorrect={false}
-            onChangeText={text => setBeneficiario(text)}
+            onChangeText={text => setCliente(text)}
             keyboardAppearance="dark"
           />
           <TextInput
